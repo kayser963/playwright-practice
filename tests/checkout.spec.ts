@@ -30,7 +30,7 @@ test.describe('Parcours de Commande - SauceDemo', () => {
     // --------------------------------------------------------------------------
     // On réutilise la méthode navigateTo() et login() de la classe LoginPage.
     // Les identifiants proviennent de SAUCE_DATA pour éviter la duplication.[span_6](start_span)[span_6](end_span)
-    await loginPage.navigateTo(SAUCE_DATA.baseUrl);
+    await loginPage.navigateTo(SAUCE_DATA.url);
     await loginPage.login(SAUCE_DATA.validUser.username, SAUCE_DATA.validUser.password);
 
     // --------------------------------------------------------------------------
@@ -38,7 +38,7 @@ test.describe('Parcours de Commande - SauceDemo', () => {
     // --------------------------------------------------------------------------
     // On force la navigation vers la page de livraison pour gagner du temps.
     // Cela isole le test et évite de dépendre des clics sur le catalogue/panier.[span_7](start_span)[span_7](end_span)
-    await page.goto(`${SAUCE_DATA.baseUrl}/checkout-step-one.html`);
+    await page.goto(`${SAUCE_DATA.url}/checkout-step-one.html`);
 
     // --------------------------------------------------------------------------
     // ÉTAPE 3 : Remplissage du formulaire via CheckoutPage

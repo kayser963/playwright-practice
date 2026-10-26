@@ -10,8 +10,8 @@ test.describe('Suite de Tests - Connexion SauceDemo', () => {
 
     // 2. Connexion
     await loginPage.login(
-      SAUCE_DATA.users.standard.username,
-      SAUCE_DATA.users.standard.password
+      SAUCE_DATA.validUser.username,
+      SAUCE_DATA.validUser.password
     );
 
     // 3. Assertion : Vérification de la redirection vers le catalogue
@@ -24,8 +24,8 @@ test.describe('Suite de Tests - Connexion SauceDemo', () => {
 
     // 2. Tentative de connexion
     await loginPage.login(
-      SAUCE_DATA.users.lockedOut.username,
-      SAUCE_DATA.users.lockedOut.password
+      SAUCE_DATA.lockedUser.username,
+      SAUCE_DATA.lockedUser.password
     );
 
     // 3. Assertions : Vérification du message d'erreur

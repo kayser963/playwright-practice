@@ -1,5 +1,6 @@
+
 export const SAUCE_DATA = {
-  baseUrl: 'https://www.saucedemo.com',
+  url: process.env.SAUCE_URL || 'https://www.saucedemo.com', //  Fallback sécurisé
   validUser: {
     username: 'standard_user', // Récupéré de "Accepted usernames are:"
     password: 'secret_sauce',  // Récupéré de "Password for all users:"
