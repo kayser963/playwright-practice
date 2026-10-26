@@ -1,0 +1,96 @@
+# ============================================================================
+# TITRE DU WORKFLOW
+# S'affiche dans l'onglet "Actions" de votre dépôt GitHub pour identifier ce pipeline.
+# ============================================================================
+name: Playwright Tests Enterprise
+
+# ============================================================================
+# ÉVÉNEMENTS DÉCLENCHEURS (TRIGGERS)
+# Détermine quand ce workflow s'exécute (automatiquement ou manuellement).
+# ============================================================================
+on:
+  # Déclenche les tests à chaque push de code sur la branche principale (main ou master)
+  push:
+    branches: [ main, master ]
+
+  # Déclenche les tests à chaque Pull Request ouverte ou mise à jour vers main/master
+  pull_request:
+    branches: [ main, master ]
+
+  # Ajoute le bouton "Run workflow" dans GitHub pour lancer les tests manuellement à la demande
+  workflow_dispatch:
+
+# ============================================================================
+# DÉFINITION DES JOBS
+# Regroupe les étapes qui s'exécuteront sur le serveur virtuel.
+# ============================================================================
+jobs:
+  test:
+    # Sécurité SDET : Interrompt le job après 60 minutes si un test reste bloqué en boucle
+    timeout-minutes: 60
+
+    # Machine virtuelle Linux Ubuntu (Le standard en CI/CD : très rapide et économique)
+    runs-on: ubuntu-latest
+
+    # ==========================================================================
+    # ÉTAPES D'EXÉCUTION (STEPS)
+    # S'exécutent de haut en bas, de manière séquentielle.
+    # ==========================================================================
+    steps:
+    # ------------------------------------------------------------------------
+    # ÉTAPE A : Récupération du code source
+    # Clone les fichiers du dépôt (.github, tests, configs, pages) sur le serveur CI.
+    # ------------------------------------------------------------------------
+    - name: Récupération du code source
+      uses: actions/checkout@v4
+
+    # ------------------------------------------------------------------------
+    # ÉTAPE B : Configuration de Node.js et gestion du cache
+    # Installe Node 20 LTS et réutilise le cache npm pour accélérer les exécutions futures.
+    # ------------------------------------------------------------------------
+    - name: Configuration de Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    # ------------------------------------------------------------------------
+    # ÉTAPE C : Installation des dépendances NPM
+    # Règle SDET : 'npm ci' (Clean Install) installe de façon stricte les versions du 
+    # package-lock.json sans les modifier, garantissant des tests 100% reproductibles.
+    # ------------------------------------------------------------------------
+    - name: Installation des dépendances NPM
+      run: npm ci
+
+    # ------------------------------------------------------------------------
+    # ÉTAPE D : Installation des navigateurs Playwright et dépendances OS Linux
+    # Règle SDET : L'option --with-deps installe automatiquement les librairies système Linux 
+    # manquantes (audio, vidéo, affichage) pour faire tourner Chromium, Firefox et WebKit.
+    # ------------------------------------------------------------------------
+    - name: Installation des navigateurs Playwright
+      run: npx playwright install --with-deps
+
+    # ------------------------------------------------------------------------
+    # ÉTAPE E : Exécution de la suite de tests Playwright
+    # Passer 'CI: true' informe playwright.config.ts qu'on est sur le serveur, ce qui :
+    # 1. Active 2 re-tentatives (retries) si un test échoue.
+    # 2. Bloque la suite si un 'test.only' a été oublié par erreur dans le code.
+    # ------------------------------------------------------------------------
+    - name: Exécution des tests Playwright
+      run: npx playwright test
+      env:
+        CI: true
+
+    # ------------------------------------------------------------------------
+    # ÉTAPE F : Publication du rapport d'exécution (Artefact téléchargeable)
+    # - if: ${{ !cancelled() }} : S'exécute TOUJOURS (même si les tests échouent).
+    # - Génère un fichier ZIP téléchargeable du dossier 'playwright-report/' sur GitHub.
+    # - Conservation du rapport pendant 30 jours.
+    # ------------------------------------------------------------------------
+    - name: Publication du rapport d'exécution (Artifact)
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

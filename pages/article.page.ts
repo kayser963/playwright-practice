@@ -1,0 +1,26 @@
+import { Page, Locator } from '@playwright/test';
+
+export class ArticlePage {
+  readonly page: Page;
+  readonly titleInput: Locator;
+  readonly descriptionInput: Locator;
+  readonly bodyInput: Locator;
+  readonly publishButton: Locator;
+  readonly articleTitleHeader: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.titleInput = page.getByPlaceholder('Article Title');
+    this.descriptionInput = page.getByPlaceholder("What's this article about?");
+    this.bodyInput = page.getByPlaceholder('Write your article (in markdown)');
+    this.publishButton = page.getByRole('button', { name: 'Publish Article' });
+    this.articleTitleHeader = page.getByRole('heading', { level: 1 });
+  }
+
+  async publishArticle(title: string, description: string, body: string): Promise<void> {
+    await this.titleInput.fill(title);
+    await this.descriptionInput.fill(description);
+    await this.bodyInput.fill(body);
+    await this.publishButton.click();
+  }
+}
