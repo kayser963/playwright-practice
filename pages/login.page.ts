@@ -18,6 +18,10 @@ export class LoginPage {
     await this.page.goto(url);
   }
 
+  async goto(url: string) {
+    await this.page.goto(url);
+  }
+
   async login(username: string, password: string): Promise<void> {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
