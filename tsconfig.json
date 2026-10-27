@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // Version de JavaScript produite par le compilateur (ES2022 supporte les fonctionnalités modernes)
+    "target": "ES2022",
+
+    // Standard de gestion des modules (ESNext permet d'utiliser les syntaxes import/export modernes)
+    "module": "ESNext",
+
+    // Stratégie de résolution des modules (mode bundler recommandé pour TypeScript 5+ et Playwright)
+    "moduleResolution": "bundler",
+
+    // Chargement global des définitions de types dans tout le projet
+    // "node" : active process.env, fs, path sans erreur dans VS Code
+    // "@playwright/test" : fournit l'autocomplétion pour test, expect, Page, Locator, etc.
+    "types": ["node", "@playwright/test"],
+
+    // Configuration des Path Aliases (Raccourcis d'importation absolus)
+    // Évite les chemins relatifs complexes comme '../../pages/login.page'
+    "paths": {
+      "@pages/*": ["./pages/*"],       // Redirige @pages/ vers le dossier ./pages/
+      "@fixtures/*": ["./fixtures/*"], // Redirige @fixtures/ vers le dossier ./fixtures/
+      "@data/*": ["./data/*"],         // Redirige @data/ vers le dossier ./data/
+      "@helpers/*": ["./helpers/*"]    // Redirige @helpers/ vers le dossier ./helpers/
+    }
+  }
+}

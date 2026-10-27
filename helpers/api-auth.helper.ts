@@ -1,5 +1,5 @@
 import { APIRequestContext, expect } from '@playwright/test';
-import { CONDUIT_DATA } from '../data/conduit-data';
+import { CONDUIT_DATA } from '@data/conduit-data';
 
 export class ApiAuthHelper {
   readonly request: APIRequestContext;
@@ -7,6 +7,8 @@ export class ApiAuthHelper {
   constructor(request: APIRequestContext) {
     this.request = request;
   }
+
+
 
   /**
    * S'assure que l'utilisateur existe (sinon le crée), puis retourne son jeton JWT.
@@ -30,19 +32,26 @@ export class ApiAuthHelper {
     }
 
     // 2. Connexion (POST /users/login)
-    const loginResponse = await this.request.post(`${CONDUIT_DATA.apiUrl}/users/login`, {
-      data: {
-        user: {
-          email: CONDUIT_DATA.user.email,
-          password: CONDUIT_DATA.user.password,
-        },
-      },
-    });
+    // 2. Connexion (POST /users/login)
+const loginResponse = await this.request.post(`${CONDUIT_DATA.apiUrl}/users/login`, {
+  data: {
+    user: {
+      email: CONDUIT_DATA.user.email,
+      password: CONDUIT_DATA.user.password,
+    },
+  },
+});
 
-    // Assertion : S'assurer que la connexion renvoie bien 200 OK
-    expect(loginResponse.status()).toBe(200);
+// Vérification : s'assurer que l'API renvoie bien 200 OK
+if (loginResponse.status() !== 200) {
+  const errorBody = await loginResponse.text();
+  throw new Error(
+    `Échec de la connexion API Conduit. Statut: ${loginResponse.status()} - Réponse: ${errorBody}`
+  );
+}
 
-    const loginBody = await loginResponse.json();
-    return loginBody.user.token;
+const loginBody = await loginResponse.json();
+return loginBody.user.token;
+
   }
 }
